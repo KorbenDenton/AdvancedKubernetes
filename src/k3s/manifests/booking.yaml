@@ -1,0 +1,126 @@
+---
+#----Deployment----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-deployment
+  labels: 
+    app: booking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking
+  template:
+    metadata:
+      labels:
+        app: booking
+    spec:
+      containers:
+        - name: booking
+          image: s21laneryel/booking-service:v2.0
+          ports:
+            - containerPort: 8083
+          env:
+            #postgres
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-password
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-host
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-port 
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-reservations-db
+            #rabbit      
+            - name: RABBIT_MQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: rabbit-host 
+            - name: RABBIT_MQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: rabbit-port
+            - name: RABBIT_MQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rabbitmq-username
+            - name: RABBIT_MQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rabbitmq-password
+            - name: RABBIT_MQ_QUEUE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rabbit-queue
+            - name: RABBIT_MQ_EXCHANGE
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rabbit-exchange
+            #api
+            - name: HOTEL_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: hotel-host
+            - name: HOTEL_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: hotel-port
+            - name: PAYMENT_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: payment-host 
+            - name: PAYMENT_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: payment-port
+            - name: LOYALTY_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: loyalty-host 
+            - name: LOYALTY_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: loyalty-port                                    
+
+---
+#----Service----
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service 
+spec:
+  selector:
+    app: booking
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083 

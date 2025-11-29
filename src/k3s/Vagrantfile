@@ -1,0 +1,28 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+  
+  config.vm.define "k3s-master" do |master|
+      master.vm.hostname = "k3s-master"
+      master.vm.network "private_network", ip: "192.168.33.10"
+      master.vm.provider "virtualbox" do |vb|
+        vb.memory = "4096"
+        vb.cpus = 2
+        vb.name = "k3s-master"
+      end
+      master.vm.provision "file", source: "./manifests", destination: "/home/vagrant/manifests"
+      master.vm.provision "shell", path: "k3s-start.sh"
+  end  
+  
+  (1..2).each do |i|
+      config.vm.define "k3s-worker#{i}" do |worker|
+        worker.vm.hostname = "k3s-worker#{i}"
+        worker.vm.network "private_network", ip: "192.168.33.1#{i}"
+        worker.vm.provider "virtualbox" do |vb|
+          vb.memory = "4096"
+          vb.cpus = 2
+          vb.name = "k3s-worker#{i}"
+        end
+        worker.vm.provision "shell", path: "k3s-start.sh"
+      end
+  end  
+end

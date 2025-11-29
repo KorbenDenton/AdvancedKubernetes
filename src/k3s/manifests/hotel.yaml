@@ -1,0 +1,63 @@
+---
+#----Deployment----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hotel-deployment
+  labels: 
+    app: hotel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hotel
+  template:
+    metadata:
+      labels:
+        app: hotel
+    spec:
+      containers:
+        - name: hotel
+          image: s21laneryel/hotel-service:v2.0
+          ports:
+            - containerPort: 8082
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-password
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-host
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-port 
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-hotels-db
+
+---
+#----Service----
+apiVersion: v1
+kind: Service
+metadata:
+  name: hotel-service 
+spec:
+  selector:
+    app: hotel
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082                

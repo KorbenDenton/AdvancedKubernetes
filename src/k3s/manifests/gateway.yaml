@@ -1,0 +1,99 @@
+---
+#----Deployment----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  labels: 
+    app: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: gateway
+          image: s21laneryel/gateway-service:v2.0
+          ports:
+            - containerPort: 8087
+          env:
+            #api
+            - name: SESSION_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: session-host
+            - name: SESSION_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: session-port
+            - name: HOTEL_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: hotel-host
+            - name: HOTEL_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: hotel-port
+            - name: BOOKING_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: booking-host
+            - name: BOOKING_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: booking-port      
+            - name: PAYMENT_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: payment-host 
+            - name: PAYMENT_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: payment-port
+            - name: LOYALTY_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: loyalty-host 
+            - name: LOYALTY_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: loyalty-port
+            - name: REPORT_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: report-host 
+            - name: REPORT_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: report-port                                          
+
+---
+#----Service----
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service 
+spec:
+  selector:
+    app: gateway
+  ports:
+    - protocol: TCP
+      port: 8087
+      targetPort: 8087

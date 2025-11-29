@@ -1,0 +1,95 @@
+---
+#----Deployment----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-deployment
+  labels: 
+    app: report
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report
+  template:
+    metadata:
+      labels:
+        app: report
+    spec:
+      containers:
+        - name: report
+          image: s21laneryel/report-service:v2.0
+          ports:
+            - containerPort: 8086
+          env:
+            #postgres
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-password
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-host
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-port 
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-statistics-db
+            #rabbit      
+            - name: RABBIT_MQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: rabbit-host 
+            - name: RABBIT_MQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: rabbit-port
+            - name: RABBIT_MQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rabbitmq-username
+            - name: RABBIT_MQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rabbitmq-password
+            - name: RABBIT_MQ_QUEUE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rabbit-queue
+            - name: RABBIT_MQ_EXCHANGE
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rabbit-exchange                  
+
+---
+#----Service----
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-service 
+spec:
+  selector:
+    app: report
+  ports:
+    - protocol: TCP
+      port: 8086
+      targetPort: 8086 

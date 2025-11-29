@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: reservation-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - laneryel.com
+    - '*.laneryel.com'
+    secretName: wildcard-laneryel-tls
+  rules:
+  - host: session.laneryel.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: session-service            
+            port:
+              number: 8081
+  - host: gateway.laneryel.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gateway-service
+            port:
+              number: 8087

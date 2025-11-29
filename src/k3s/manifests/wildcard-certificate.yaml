@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-laneryel
+  namespace: default
+spec:
+  secretName: wildcard-laneryel-tls   # Имя секрета для Ingress
+  dnsNames:
+  - 'laneryel.com'
+  - '*.laneryel.com'
+  issuerRef:
+    name: selfsigned-wildcard
+    kind: ClusterIssuer

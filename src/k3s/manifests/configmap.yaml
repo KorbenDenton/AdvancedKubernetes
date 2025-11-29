@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-configmap
+data:
+  #хосты и порты
+  postgres-host: postgres
+  postgres-port: "5432"
+  rabbit-host: rabbitmq-service
+  rabbit-port: "5672"
+  session-host: session-service
+  session-port: "8081"
+  hotel-host: hotel-service
+  hotel-port: "8082"   
+  booking-host: booking-service
+  booking-port: "8083"
+  payment-host: payment-service
+  payment-port: "8084"
+  loyalty-host: loyalty-service
+  loyalty-port: "8085"
+  report-host: report-service
+  report-port: "8086"
+
+  #базы данных для сервисов
+  postgres-users-db: users_db
+  postgres-hotels-db: hotels_db
+  postgres-payments-db: payments_db
+  postgres-balances-db: balances_db
+  postgres-statistics-db: statistics_db
+  postgres-reservations-db: reservations_db

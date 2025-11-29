@@ -1,0 +1,63 @@
+---
+#----Deployment----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: session-deployment
+  labels: 
+    app: session
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: session
+  template:
+    metadata:
+      labels:
+        app: session
+    spec:
+      containers:
+        - name: session
+          image: s21laneryel/session-service:v2.0
+          ports:
+            - containerPort: 8081
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-password
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-host
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-port 
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-users-db
+
+---
+#----Service----
+apiVersion: v1
+kind: Service
+metadata:
+  name: session-service 
+spec:
+  selector:
+    app: session
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081                
